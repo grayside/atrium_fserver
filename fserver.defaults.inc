@@ -431,11 +431,23 @@ function _fserver_content_default_fields() {
     'referenceable_types' => array(
       'fserver_distro' => 'fserver_distro',
       'fserver_project' => 'fserver_project',
-      'page' => 0,
+      'crowd_qa_answer' => 0,
+      'book' => 0,
+      'casetracker_basic_case' => 0,
+      'blog' => 0,
+      'event' => 0,
+      'group' => 0,
+      'presentation' => 0,
+      'presenter' => 0,
+      'profile' => 0,
+      'casetracker_basic_project' => 0,
       'fserver_release' => 0,
-      'story' => 0,
+      'shoutbox' => 0,
+      'project_ticket' => 0,
+      'feed_ical_item' => 0,
+      'feed_ical' => 0,
     ),
-    'advanced_view' => '--',
+    'advanced_view' => 'fserver_project_options',
     'advanced_view_args' => '',
     'widget' => array(
       'autocomplete_match' => 'contains',
@@ -725,16 +737,45 @@ function _fserver_context_default_contexts() {
   $context = new stdClass;
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
-  $context->name = 'fserver-section-project';
+  $context->name = 'fserver-section-feature';
   $context->description = 'Feature Server Releases';
-  $context->tag = 'fserver';
+  $context->tag = 'Feature Server';
   $context->conditions = array(
     'node' => array(
       'values' => array(
-        '0' => 'fserver_project',
-        '1' => 'fserver_distro',
+        'fserver_distro' => 'fserver_distro',
+        'fserver_project' => 'fserver_project',
+        'fserver_release' => 'fserver_release',
       ),
-      'options' => array(),
+      'options' => array(
+        'node_form' => 1,
+      ),
+    ),
+    'views' => array(
+      'values' => array(
+        'fserver_projects:page_1' => 'fserver_projects:page_1',
+      ),
+    ),
+  );
+  $context->reactions = array();
+  $context->condition_mode = 0;
+
+  $export['fserver-section-feature'] = $context;
+  $context = new stdClass;
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->api_version = 3;
+  $context->name = 'fserver-section-project';
+  $context->description = 'Feature Server Releases';
+  $context->tag = 'Feature Server';
+  $context->conditions = array(
+    'node' => array(
+      'values' => array(
+        'fserver_distro' => 'fserver_distro',
+        'fserver_project' => 'fserver_project',
+      ),
+      'options' => array(
+        'node_form' => 1,
+      ),
     ),
   );
   $context->reactions = array(
@@ -743,15 +784,13 @@ function _fserver_context_default_contexts() {
         'views-fserver_releases-block_1' => array(
           'module' => 'views',
           'delta' => 'fserver_releases-block_1',
-          'weight' => 7,
           'region' => 'content',
-          'status' => '0',
-          'label' => 'fserver_releases: Recommended releases',
-          'type' => 'context_ui',
+          'weight' => 0,
         ),
       ),
     ),
   );
+  $context->condition_mode = 0;
 
   $export['fserver-section-project'] = $context;
   return $export;
@@ -767,7 +806,7 @@ function _fserver_ctools_plugin_api() {
   if ($module == "context" && $api == "context") {
     return array("version" => 3);
   }
-  else if ($module == "system" && $api == "strongarm") {
+  elseif ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
 }
@@ -1038,21 +1077,21 @@ function _fserver_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_distro';
-  $strongarm->value = '0';
+  $strongarm->value = '2';
 
   $export['comment_fserver_distro'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_project';
-  $strongarm->value = '0';
+  $strongarm->value = '2';
 
   $export['comment_fserver_project'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_release';
-  $strongarm->value = '0';
+  $strongarm->value = '2';
 
   $export['comment_fserver_release'] = $strongarm;
   $strongarm = new stdClass;
@@ -1164,21 +1203,21 @@ function _fserver_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'enable_revisions_page_fserver_distro';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['enable_revisions_page_fserver_distro'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'enable_revisions_page_fserver_project';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['enable_revisions_page_fserver_project'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'enable_revisions_page_fserver_release';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['enable_revisions_page_fserver_release'] = $strongarm;
   $strongarm = new stdClass;
@@ -1186,7 +1225,8 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'node_options_fserver_distro';
   $strongarm->value = array(
-    '0' => 'status',
+    0 => 'status',
+    1 => 'promote',
   );
 
   $export['node_options_fserver_distro'] = $strongarm;
@@ -1195,7 +1235,8 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'node_options_fserver_project';
   $strongarm->value = array(
-    '0' => 'status',
+    0 => 'status',
+    1 => 'promote',
   );
 
   $export['node_options_fserver_project'] = $strongarm;
@@ -1204,7 +1245,8 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'node_options_fserver_release';
   $strongarm->value = array(
-    '0' => 'status',
+    0 => 'status',
+    1 => 'promote',
   );
 
   $export['node_options_fserver_release'] = $strongarm;
@@ -1213,9 +1255,9 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_content_type_fserver_distro';
   $strongarm->value = array(
-    '0' => 'thread',
-    '1' => 'nodetype',
-    '2' => 'author',
+    0 => 'thread',
+    1 => 'nodetype',
+    2 => 'author',
   );
 
   $export['notifications_content_type_fserver_distro'] = $strongarm;
@@ -1224,9 +1266,9 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_content_type_fserver_project';
   $strongarm->value = array(
-    '0' => 'thread',
-    '1' => 'nodetype',
-    '2' => 'author',
+    0 => 'thread',
+    1 => 'nodetype',
+    2 => 'author',
   );
 
   $export['notifications_content_type_fserver_project'] = $strongarm;
@@ -1235,9 +1277,9 @@ function _fserver_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'notifications_content_type_fserver_release';
   $strongarm->value = array(
-    '0' => 'thread',
-    '1' => 'nodetype',
-    '2' => 'author',
+    0 => 'thread',
+    1 => 'nodetype',
+    2 => 'author',
   );
 
   $export['notifications_content_type_fserver_release'] = $strongarm;
@@ -1287,42 +1329,42 @@ function _fserver_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'show_preview_changes_fserver_distro';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['show_preview_changes_fserver_distro'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'show_preview_changes_fserver_project';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['show_preview_changes_fserver_project'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'show_preview_changes_fserver_release';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
 
   $export['show_preview_changes_fserver_release'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'upload_fserver_distro';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
 
   $export['upload_fserver_distro'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'upload_fserver_project';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
 
   $export['upload_fserver_project'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'upload_fserver_release';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
 
   $export['upload_fserver_release'] = $strongarm;
   $strongarm = new stdClass;

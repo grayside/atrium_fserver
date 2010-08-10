@@ -3,6 +3,13 @@
 include_once('fserver.features.inc');
 
 /**
+ * Implementation of hook_init().
+ */
+function fserver_init() {
+  drupal_add_css(drupal_get_path('module', 'fserver') . '/fserver.css');
+}
+
+/**
  * Implementation of hook_views_api().
  */
 function fserver_views_api() {
@@ -18,15 +25,26 @@ function fserver_views_api() {
 function fserver_link($type, $object, $teaser = FALSE) {
   // Only allow releases to be added if packaging method is 0 => 'Manual'.
   $links = array();
-  if ($type == 'node' && $object->type == 'fserver_project' && empty($object->field_fserver_method[0]['value'])) {
-    $item = menu_get_item('node/add/fserver-release');
-    if ($item && $item['access']) {
-      $links['fserver-add-release'] = array(
-        'title' => t('Add new @release', array('@release' => strtolower($item['title']))),
-        'href' => 'node/add/fserver-release',
+  if ($type == 'node') {
+    if ($object->type == 'fserver_project' && empty($object->field_fserver_method[0]['value'])) {
+      $item = menu_get_item('node/add/fserver-release');
+      if ($item && $item['access']) {
+        $links['fserver-add-release'] = array(
+          'title' => t('Add new @release', array('@release' => strtolower($item['title']))),
+          'href' => 'node/add/fserver-release',
+          'query' => 'edit[field_fserver_project][0][nid]=' . $object->nid,
+        );
+      }
+    }
+    elseif ($object->type == 'fserver_release') {
+      $links['fserver-release-project'] = array(
+        'title' => t('Project'),
+        'href' => 'node/' . $object->field_fserver_project[0]['nid'],
       );
     }
   }
+
+
   return $links;
 }
 
@@ -37,7 +55,7 @@ function fserver_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   if ($op == 'view' && $node->type == 'fserver_distro' && menu_get_object()->nid === $node->nid) {
     $node->content['field_fserver_drushmake']['field']['items'][0]['#item']['safe'] = '<fieldset>'. implode('<br />', explode("\r\n", $node->content['field_fserver_drushmake']['field']['items'][0]['#item']['safe'])) .'</fieldset>';
   }
-  if ($op == 'view' && $node->type == 'fserver_project' && menu_get_object()->nid === $node->nid) {
+  elseif ($op == 'view' && $node->type == 'fserver_project' && menu_get_object()->nid === $node->nid) {
     $url = url("fserver", array('purl' => array('disabled' => TRUE), 'absolute' => TRUE));
     $project = check_plain($node->field_fserver_name[0]['value']);
     $node->content['project_info'] = array(
@@ -87,7 +105,6 @@ function fserver_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     }
   }
   else if ($op == 'view' && $node->type == 'fserver_release') {
-    drupal_add_css(drupal_get_path('module', 'fserver') . '/fserver.css');
     $download_url = url($node->field_fserver_file[0]['filepath'], array('purl' => array('disabled' => TRUE), 'absolute' => TRUE));
     $contents = file_exists($node->field_fserver_file[0]['filepath']) ? file_get_contents($node->field_fserver_file[0]['filepath']) : '';
     $info = array();
@@ -103,7 +120,6 @@ function fserver_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       '#weight' => -10,
     );
     $project = node_load($node->field_fserver_project[0]['nid']);
-    drupal_set_breadcrumb(array(l(t('Home'), NULL), l($project->title, 'node/' . $project->nid)));
   }
 }
 
@@ -215,6 +231,18 @@ function fserver_release_node_form_submit($form, &$form_state) {
     $node = node_submit($form_state['values']);
     $node->title = fserver_generate_version($node);
     $form_state['values'] = (array) $node;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter() for spaces_features_form.
+ * Warn the group administrator that fserver updates do not play nice with private groups.
+ */
+function fserver_form_spaces_features_form_alter(&$form, &$form_state) {
+  $space = spaces_get_space();
+  if ($space->controllers->variable->values['preset']['spaces_og_private']
+    && $space->controllers->variable->values['space']['spaces_features']['fserver']) {
+      drupal_set_message(t('Features hosted in a private group will not provide update notifications to Drupal sites.'), 'warning');
   }
 }
 

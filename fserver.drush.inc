@@ -21,15 +21,15 @@
  */
 function fserver_drush_command() {
   $items = array();
-  $items['fserver status'] = array(
+  $items['fserver-status'] = array(
     'callback' => 'fserver_drush_status',
     'description' => 'Determine the packaging status of a project.',
   );
-  $items['fserver package'] = array(
+  $items['fserver-package'] = array(
     'callback' => 'fserver_drush_package',
     'description' => 'Update packaging for a project.',
   );
-  $items['fserver distro'] = array(
+  $items['fserver-distro'] = array(
     'callback' => 'fserver_drush_distro',
     'description' => 'Update packaging for a distribution.',
   );

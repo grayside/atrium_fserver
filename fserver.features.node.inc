@@ -17,7 +17,7 @@ function _fserver_node_info() {
       'help' => '',
     ),
     'fserver_project' => array(
-      'name' => t('Project'),
+      'name' => t('Feature'),
       'module' => 'features',
       'description' => t('A feature project page. Provides a summary of project information and releases for download.'),
       'has_title' => '1',

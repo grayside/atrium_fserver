@@ -15,3 +15,10 @@ ul#fserver-release-info li {
   margin: 0;
   padding: 0;
 }
+
+.feature-fserver {
+  background:url(images/fserver-20.png) no-repeat !important;
+}
+
+#features-menu li a.icon-fserver span.icon {
+  background:url(images/fserver-40.png) no-repeat;
