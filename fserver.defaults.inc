@@ -757,7 +757,9 @@ function _fserver_context_default_contexts() {
       ),
     ),
   );
-  $context->reactions = array();
+  $context->reactions = array(
+    'menu' => 'fserver',
+  );
   $context->condition_mode = 0;
 
   $export['fserver-section-feature'] = $context;
