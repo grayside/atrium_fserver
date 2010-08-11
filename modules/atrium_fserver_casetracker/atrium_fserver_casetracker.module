@@ -54,14 +54,11 @@ function atrium_fserver_casetracker_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Implementation of hook_context_default_contexts_alter().
  */
-function atrium_fserver_casetracker_context_default_context_alter(&$contexts) {
+function atrium_fserver_casetracker_context_default_contexts_alter(&$contexts) {
   $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_project'] = 'fserver_project';
   $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_project'] = 'fserver_project';
-  $contexts['spaces-feature-casetracker']->conditions['node']['values']['fserver_project'] = 'fserver_project';
-
-  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_project'] = 'fserver_distro';
-  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_project'] = 'fserver_distro';
-  $contexts['spaces-feature-casetracker']->conditions['node']['values']['fserver_project'] = 'fserver_distro';
+  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_distro'] = 'fserver_distro';
+  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_distro'] = 'fserver_distro';
 }
 
 /**
