@@ -1,3 +1,8 @@
 # Atrium Feature Tracker
 
 This module adjusts Atrium's settings to use Features and Distributions as Project types.
+
+## Installation
+
+1. Go to admin/settings/casetracker and make sure the Feature and Distribution content types are 
+checked as Project types.

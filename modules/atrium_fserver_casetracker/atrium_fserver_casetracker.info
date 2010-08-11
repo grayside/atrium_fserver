@@ -1,5 +1,10 @@
-; $Id$
-name = "Atrium Feature Tracker"
-description = "Transforms the Feature and Distribution content types into Case Tracker projects."
 core = "6.x"
+dependencies[] = "atrium_casetracker"
+dependencies[] = "fserver"
+dependencies[] = "taxonomy"
+description = "Transforms the Feature and Distribution content types into Case Tracker projects."
+features[context][] = "fserver-section-casetracker"
+features[ctools][] = "context:context:3"
+features[ctools][] = "strongarm:strongarm:1"
+name = "Atrium Feature Tracker"
 package = "Features"

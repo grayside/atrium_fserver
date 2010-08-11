@@ -6,6 +6,8 @@
  *  Atrium Feature Tracker converts Feature Server projects & distributions into Casetracker Projects.
  */
 
+include_once 'atrium_fserver_casetracker.features.inc';
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -16,7 +18,7 @@ function atrium_fserver_casetracker_nodeapi(&$node, $op, $teaser = NULL, $page =
       if (menu_get_object() === $node) {
         switch ($node->type) {
           case 'fserver_project':
-          case 'fserver-distro':
+          case 'fserver_distro':
             // Omit casetracker project summary -- not useful at the moment (may be one day...)
             unset($node->content['casetracker_project_summary']);
             break;
@@ -51,14 +53,46 @@ function atrium_fserver_casetracker_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+function atrium_fserver_casetracker_link($type, $object, $teaser = FALSE) {
+  $links = array();
+  if ($type == 'node') {
+    if ($object->type == 'fserver_project' || $object->type == 'fserver_distro') {
+      $item = menu_get_item('node/add/casetracker-basic-case');
+      if ($item && $item['access']) {
+        $links['fserver-add-case'] = array(
+          'title' => t('Add new @case', array ('@case' => strtolower($item['title']))),
+          'href' => 'node/add/casetracker-basic-case', 
+          'query' => 'edit[casetracker][pid]=' . $object->nid,
+        );
+      }
+    }
+    elseif ($object->type == 'fserver_release') {
+      $links['fserver-project-issues'] = array(
+         'title' => t('View issues'),
+         'href' => 'casetracker/all',
+         'query' => array(
+           'pid' => $object->field_fserver_project[0]['nid'],
+           'case_status_closed' => 1,
+         ),
+      );
+    }
+  }
+  return $links;
+}
+
+
 /**
- * Implementation of hook_context_default_contexts_alter().
+ * Implementation of hook_strongarm_alter().
  */
-function atrium_fserver_casetracker_context_default_contexts_alter(&$contexts) {
-  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_project'] = 'fserver_project';
-  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_project'] = 'fserver_project';
-  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_distro'] = 'fserver_distro';
-  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_distro'] = 'fserver_distro';
+function atrium_fserver_casetracker_strongarm_alter(&$arms) {
+  $arms['book_allowed_types']->value[] = 'fserver_project';
+  $arms['book_allowed_types']->value[] = 'fserver_distro';
+
+  // casetracker_project_node_types not currently strongarmed, but it shouldn't be by this module.
+  if (!empty($arms['casetracker_project_node_types'])) {
+    $arms['casetracker_project_node_types']->value[] = 'fserver_project';
+    $arms['casetracker_project_node_types']->value[] = 'fserver_distro';
+  }
 }
 
 /**

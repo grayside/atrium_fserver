@@ -43,8 +43,6 @@ function fserver_link($type, $object, $teaser = FALSE) {
       );
     }
   }
-
-
   return $links;
 }
 
