@@ -1,0 +1,93 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *  Atrium Feature Tracker converts Feature Server projects & distributions into Casetracker Projects.
+ */
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function atrium_fserver_casetracker_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  switch ($op) {
+    case 'view':
+      // Confirm we are actually on a page of relevance
+      if (menu_get_object() === $node) {
+        switch ($node->type) {
+          case 'fserver_project':
+          case 'fserver-distro':
+            // Omit casetracker project summary -- not useful at the moment (may be one day...)
+            unset($node->content['casetracker_project_summary']);
+            break;
+        }
+      }
+      // Omit book-related links if the atrium_book feature is not available.
+      $space = spaces_get_space();
+      if (!$space->controllers->variable->values['space']['spaces_features']['atrium_book']) {
+        unset($node->book);
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function atrium_fserver_casetracker_form_alter(&$form, &$form_state, $form_id) {
+  if (!empty($form['#node']) && !empty($form['book'])) {
+    switch ($form['#node']->type) {
+      case 'fserver_project':
+      case 'fserver_distro':
+        if (!empty($form['#node']->nid) && isset($form['book']['bid']['#options'][$form['#node']->nid])) {
+          $form['book']['bid']['#default_value'] = $form['#node']->nid;
+        }
+        else {
+          $form['book']['bid']['#default_value'] = 'new';
+        }
+        $form['book']['#access'] = FALSE;
+        break;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_context_default_contexts_alter().
+ */
+function atrium_fserver_casetracker_context_default_context_alter(&$contexts) {
+  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_project'] = 'fserver_project';
+  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_project'] = 'fserver_project';
+  $contexts['spaces-feature-casetracker']->conditions['node']['values']['fserver_project'] = 'fserver_project';
+
+  $contexts['atrium-casetracker-book']->conditions['bookroot']['values']['fserver_project'] = 'fserver_distro';
+  $contexts['atrium-casetracker-project']->conditions['node']['values']['fserver_project'] = 'fserver_distro';
+  $contexts['spaces-feature-casetracker']->conditions['node']['values']['fserver_project'] = 'fserver_distro';
+}
+
+/**
+ * Implementation of hook_views_default_views_alter().
+ */
+function atrium_fserver_casetracker_views_default_views_alter(&$views) {
+  // Add fserver_project and fserver_distro to valid project types for project case listing.
+  $views['atrium_casetracker']->display['page_3']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_distro'] = 'fserver_distro';
+  $views['atrium_casetracker']->display['page_3']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_project'] = 'fserver_project';
+  $views['atrium_casetracker']->display['block_1']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_distro'] = 'fserver_distro';
+  $views['atrium_casetracker']->display['block_1']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_project'] = 'fserver_project';
+ 
+  // Make casetracker_basic_case project options open to any CT project type.
+  unset($views['atrium_ct_project_options']->display['default']->display_options['filters']['type']);
+  $views['atrium_ct_project_options']->display['default']->display_options['filters']['project_1'] = array(
+    'operator' => '=',
+    'value' => '',
+    'group' => '0',
+    'exposed' => FALSE,
+    'expose' => array(
+      'operator' => FALSE,
+      'label' => '',
+    ),
+    'id' => 'project_1',
+    'table' => 'node',
+    'field' => 'project',
+    'relationship' => 'none',
+  );
+}

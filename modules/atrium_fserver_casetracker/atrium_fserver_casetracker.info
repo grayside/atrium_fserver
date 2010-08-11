@@ -1,0 +1,5 @@
+; $Id$
+name = "Atrium Feature Tracker"
+description = "Transforms the Feature and Distribution content types into Case Tracker projects."
+core = "6.x"
+package = "Features"

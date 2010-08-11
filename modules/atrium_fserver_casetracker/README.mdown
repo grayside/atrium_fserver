@@ -1,0 +1,3 @@
+# Atrium Feature Tracker
+
+This module adjusts Atrium's settings to use Features and Distributions as Project types.
