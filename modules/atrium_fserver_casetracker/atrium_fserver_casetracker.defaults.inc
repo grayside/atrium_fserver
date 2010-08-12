@@ -21,11 +21,6 @@ function _atrium_fserver_casetracker_context_default_contexts() {
         'node_form' => 1,
       ),
     ),
-    'views' => array(
-      'values' => array(
-        'fserver_projects:page_1' => 'fserver_projects:page_1',
-      ),
-    ),
   );
   $context->reactions = array(
     'block' => array(
@@ -41,6 +36,12 @@ function _atrium_fserver_casetracker_context_default_contexts() {
           'delta' => 'atrium_casetracker-block_2',
           'region' => 'right',
           'weight' => 1,
+        ),
+        'views-atrium_casetracker-block_1' => array(
+          'module' => 'views',
+          'delta' => 'atrium_casetracker-block_1',
+          'region' => 'content',
+          'weight' => 0,
         ),
         'views-3de5a072e9754aa7bce60e3f05d1538e' => array(
           'module' => 'views',
