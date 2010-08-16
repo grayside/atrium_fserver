@@ -738,7 +738,7 @@ function _fserver_context_default_contexts() {
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'fserver-section-feature';
-  $context->description = 'Feature Server Releases';
+  $context->description = 'Feature Server > All';
   $context->tag = 'Feature Server';
   $context->conditions = array(
     'node' => array(
@@ -767,7 +767,7 @@ function _fserver_context_default_contexts() {
   $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'fserver-section-project';
-  $context->description = 'Feature Server Releases';
+  $context->description = 'Feature Server > Projects';
   $context->tag = 'Feature Server';
   $context->conditions = array(
     'node' => array(
@@ -776,7 +776,7 @@ function _fserver_context_default_contexts() {
         'fserver_project' => 'fserver_project',
       ),
       'options' => array(
-        'node_form' => 1,
+        'node_form' => 0,
       ),
     ),
   );
@@ -1079,21 +1079,21 @@ function _fserver_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_distro';
-  $strongarm->value = '2';
+  $strongarm->value = '0';
 
   $export['comment_fserver_distro'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_project';
-  $strongarm->value = '2';
+  $strongarm->value = '0';
 
   $export['comment_fserver_project'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'comment_fserver_release';
-  $strongarm->value = '2';
+  $strongarm->value = '0';
 
   $export['comment_fserver_release'] = $strongarm;
   $strongarm = new stdClass;
