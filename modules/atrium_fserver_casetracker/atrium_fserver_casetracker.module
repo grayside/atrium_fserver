@@ -99,15 +99,10 @@ function atrium_fserver_casetracker_strongarm_alter(&$arms) {
  * Implementation of hook_views_default_views_alter().
  */
 function atrium_fserver_casetracker_views_default_views_alter(&$views) {
-  // Add fserver_project and fserver_distro to valid project types for project case listing.
-  $views['atrium_casetracker']->display['page_3']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_distro'] = 'fserver_distro';
-  $views['atrium_casetracker']->display['page_3']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_project'] = 'fserver_project';
-  $views['atrium_casetracker']->display['block_1']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_distro'] = 'fserver_distro';
-  $views['atrium_casetracker']->display['block_1']->display_options['arguments']['nid']['validate_argument_node_type']['fserver_project'] = 'fserver_project';
- 
-  // Make casetracker_basic_case project options open to any CT project type.
-  unset($views['atrium_ct_project_options']->display['default']->display_options['filters']['type']);
-  $views['atrium_ct_project_options']->display['default']->display_options['filters']['project_1'] = array(
+dpm($views['casetracker_override_project_options']->display['default']); 
+ // Make casetracker_basic_case project options open to any CT project type.
+  unset($views['casetracker_override_project_options']->display['default']->display_options['filters']['type']);
+  $views['casetracker_override_project_options']->display['default']->display_options['filters']['project_1'] = array(
     'operator' => '=',
     'value' => '',
     'group' => '0',
