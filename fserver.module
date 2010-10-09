@@ -10,16 +10,6 @@ function fserver_init() {
 }
 
 /**
- * Implementation of hook_views_api().
- */
-function fserver_views_api() {
-  return array(
-    'api' => 2,
-    'path' => drupal_get_path('module', 'fserver') .'/views',
-  );
-}
-
-/**
  * Implementation of hook_link().
  */
 function fserver_link($type, $object, $teaser = FALSE) {
